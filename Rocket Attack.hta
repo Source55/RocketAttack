@@ -1,0 +1,102 @@
+<HTA:APPLICATION BORDER="thin" MAXIMIZEBUTTON="no" MINIMIZEBUTTON="no" SCROLL="no">
+<html>
+<title>Rocket Attack</title>
+<body onKeyDown="vira(event.keyCode);" onKeyUp="para();" background=RA/fundo.jpg>
+<center><img src=RA/logo.png onclick="rocketattack();" style='width:360px; margin-top:100px;'></center><bgsound id=som>
+<script>
+window.resizeTo(500,532);
+esq=false;
+dir=false;
+fatorx=[9,8,7,6,5,4,3,2,1,0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8];
+fatory=[0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,8,7,6,5,4,3,2,1];
+pista=[
+[2,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,2,3,3,3,3,3,0],
+[2,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,2,0,0,0,0,1,0],
+[2,0,4,4,4,4,4,4,4,4,2,0,1,0,0,0,2,0,4,4,4,1,0],
+[2,0,1,0,0,0,0,0,0,0,2,0,1,0,0,0,2,0,1,0,0,0,0],
+[2,0,1,0,2,0,1,0,0,0,2,0,1,0,0,0,2,0,1,3,3,3,3],
+[2,0,1,0,2,0,1,0,0,0,2,0,1,0,0,0,2,0,0,0,0,0,1],
+[2,0,1,0,2,0,1,0,0,0,4,4,1,0,0,0,4,4,4,4,2,0,1],
+[2,0,1,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1],
+[2,0,1,0,2,0,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,1],
+[2,0,1,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[2,0,1,0,4,4,4,4,2,0,4,4,2,0,4,4,4,4,4,4,4,4,1],
+[2,0,1,0,0,0,0,0,2,0,1,0,2,0,1,0,0,0,0,0,0,0,0],
+[2,0,1,3,3,3,3,3,3,0,1,0,2,0,1,0,0,0,0,0,0,0,0],
+[2,0,0,0,0,0,0,0,0,0,1,0,2,0,1,0,0,0,0,0,0,0,0],
+[4,4,4,4,4,4,4,4,4,4,1,0,4,4,1,0,0,0,0,0,0,0,0]
+];
+function inicia(){
+	esq=false;
+	dir=false;
+	angulo=18;
+	anguloadv=18;
+	posx=-630;
+	posy=-710;
+	advx=-630;
+	advy=-620;
+	tempo=0;
+	document.getElementById('som').src="RA/musica.mp3";
+}
+function vira(k){
+	if(k==37||k==65)esq=true;
+	if(k==39||k==68)dir=true;
+}
+function para(){
+	esq=false;
+	dir=false;
+}
+function move(){
+	lx=Math.ceil((-advx+30)/200);
+	ly=Math.ceil((-advy+40)/200);
+	advx+=fatorx[anguloadv]*3.36;
+	advy+=fatory[anguloadv]*3.36;
+	if(pista[lx][ly]==4)anguloadv=9;
+	if(pista[lx][ly]==2)anguloadv=18;
+	if(pista[lx][ly]==3)anguloadv=27;
+	if(pista[lx][ly]==1)anguloadv=0;
+	document.getElementById('adv').src="RA/Adversario/"+anguloadv+'.png';
+	document.getElementById('adv').style.top=(posx-advx+200)+'px';
+	document.getElementById('adv').style.left=(posy-advy+200)+'px';
+	if(lx==3&&ly==6){
+		alert('A nave oponente chegou ao final antes de você !!!');
+		inicia();
+	}
+	if(esq)angulo=(angulo+35)%36;
+	if(dir)angulo=(angulo+1)%36;
+	document.getElementById('car').src="RA/Foguetes/"+angulo+'.png';
+	document.getElementById('tracado').style.top=posx+'px';
+	document.getElementById('tracado').style.left=posy+'px';
+	lx=Math.ceil((-posx+30)/200);
+	ly=Math.ceil((-posy+40)/200);
+	if(lx>=0&&ly>=0&&lx<pista.length&&ly<pista[0].length&&pista[lx][ly]!=0){
+		posx+=fatorx[angulo]*3.7;
+		posy+=fatory[angulo]*3.7;
+	}
+	else{
+		if(lx==3&&ly==6){
+			alert('Você venceu !\n\nFim do Jogo !!!');
+			window.close();
+		}
+		else if(tempo/9.8>50)alert(parseInt(Math.min(tempo/9.8,100))+"%");
+		inicia();
+	}
+	//if(Math.sqrt(((posx-advx)*(posx-advx))+((posy-advy)*(posy-advy)))<40)inicia();
+	document.getElementById('percent').innerHTML=parseInt(Math.min(tempo/9.8,100))+"%";
+	setTimeout('move();',34+(parseInt((980-(tempo++))*.5/20)));
+}
+function rocketattack(){
+	inicia();
+	texto="<center><img style='width:64px; position:absolute; z-index:2; top:200px; left:200px;' id=car src=RA/Foguetes/18.png><img style='width:64px; position:absolute; z-index:2; top:200px; left:200px;' id=adv src=RA/Adversario/18.png></center><div id=percent style='position:absolute; z-index:2; color:#0f0; right:12px;'>20%</div><table cellpadding=0 cellspacing=0 id=tracado style='position:absolute; z-index:1; top:"+posy+"px; left:"+posx+"px;'><tr>";
+	for(x=0;x<pista.length;x++){
+		for(y=0;y<pista[x].length;y++)
+			if(pista[x][y]!=0)texto+="<td><img src=RA/"+pista[x][y]+".png></td>";
+			else texto+="<td style='width:200px;'> </td>";
+		texto+="</tr><tr>";
+	}
+	document.body.innerHTML=texto+"</tr></table><bgsound id=som src=RA/musica.mp3>";
+	move();
+}
+</script>
+</body>
+</html>
